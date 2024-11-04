@@ -94,8 +94,8 @@ class Depthimage2Pointcloud2 : public rclcpp::Node
       sensor_msgs::msg::PointCloud2::SharedPtr cloud_msg =
         std::make_shared<sensor_msgs::msg::PointCloud2>();
       cloud_msg->header = image->header;
-      cloud_msg->height = image->height / 2; //to decimate the point cloud to a quarter of the image resolution
-      cloud_msg->width = image->width / 2;  //to decimate the point cloud to a quarter of the image resolution
+      cloud_msg->height = image->height / 4; //to decimate the point cloud to a quarter of the image resolution
+      cloud_msg->width = image->width / 4;  //to decimate the point cloud to a quarter of the image resolution
       cloud_msg->is_dense = false;
       cloud_msg->is_bigendian = false;
       cloud_msg->fields.clear();

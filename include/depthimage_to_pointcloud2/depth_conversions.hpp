@@ -76,8 +76,8 @@ void convert(
   sensor_msgs::PointCloud2Iterator<float> iter_rgb(*cloud_msg, "rgb");
   const T * depth_row = reinterpret_cast<const T *>(&depth_msg->data[0]);
   int row_step = depth_msg->step / sizeof(T);
-  for (int v = 0; v < static_cast<int>(depth_msg->height); v += 2, depth_row += 2*row_step) {
-    for (int u = 0; u < static_cast<int>(depth_msg->width); u += 2, ++iter_x, ++iter_y, ++iter_z, ++iter_rgb) {
+  for (int v = 0; v < static_cast<int>(depth_msg->height); v += 4, depth_row += 4*row_step) {
+    for (int u = 0; u < static_cast<int>(depth_msg->width); u += 4, ++iter_x, ++iter_y, ++iter_z, ++iter_rgb) {
       T depth = depth_row[u];
 
       // Missing points denoted by NaNs
