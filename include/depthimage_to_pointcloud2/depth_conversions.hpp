@@ -58,6 +58,7 @@ void convert(
   const image_geometry::PinholeCameraModel & model,
   double range_max = 0.0,
   bool use_quiet_nan = false,
+  int decimation_factor = 4,
  cv_bridge::CvImageConstPtr cv_ptr = nullptr)
 {
   // Use correct principal point from calibration
@@ -76,8 +77,8 @@ void convert(
   sensor_msgs::PointCloud2Iterator<float> iter_rgb(*cloud_msg, "rgb");
   const T * depth_row = reinterpret_cast<const T *>(&depth_msg->data[0]);
   int row_step = depth_msg->step / sizeof(T);
-  for (int v = 0; v < static_cast<int>(depth_msg->height); v += 4, depth_row += 4*row_step) {
-    for (int u = 0; u < static_cast<int>(depth_msg->width); u += 4, ++iter_x, ++iter_y, ++iter_z, ++iter_rgb) {
+  for (int v = 0; v < static_cast<int>(depth_msg->height); v += decimation_factor, depth_row += decimation_factor*row_step) {
+    for (int u = 0; u < static_cast<int>(depth_msg->width); u += decimation_factor, ++iter_x, ++iter_y, ++iter_z, ++iter_rgb) {
       T depth = depth_row[u];
 
       // Missing points denoted by NaNs

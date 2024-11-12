@@ -50,6 +50,7 @@ class Depthimage2Pointcloud2 : public rclcpp::Node
       range_max = this->declare_parameter("range_max", 0.0);
       use_quiet_nan = this->declare_parameter("use_quiet_nan", true);
       colorful = this->declare_parameter("colorful", false);
+      decimation_factor = this->declare_parameter("decimation_factor", 4);
 
       g_pub_point_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("pointcloud2", 10);
 
@@ -94,8 +95,8 @@ class Depthimage2Pointcloud2 : public rclcpp::Node
       sensor_msgs::msg::PointCloud2::SharedPtr cloud_msg =
         std::make_shared<sensor_msgs::msg::PointCloud2>();
       cloud_msg->header = image->header;
-      cloud_msg->height = image->height / 4; //to decimate the point cloud to a quarter of the image resolution
-      cloud_msg->width = image->width / 4;  //to decimate the point cloud to a quarter of the image resolution
+      cloud_msg->height = image->height / decimation_factor; //to decimate the point cloud to a quarter of the image resolution
+      cloud_msg->width = image->width / decimation_factor;  //to decimate the point cloud to a quarter of the image resolution
       cloud_msg->is_dense = false;
       cloud_msg->is_bigendian = false;
       cloud_msg->fields.clear();
@@ -110,9 +111,9 @@ class Depthimage2Pointcloud2 : public rclcpp::Node
       model.fromCameraInfo(g_cam_info);
 
       if (image->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
-        depthimage_to_pointcloud2::convert<uint16_t>(image, cloud_msg, model, range_max, use_quiet_nan, cv_ptr);
+        depthimage_to_pointcloud2::convert<uint16_t>(image, cloud_msg, model, range_max, use_quiet_nan, decimation_factor, cv_ptr);
       } else if (image->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
-        depthimage_to_pointcloud2::convert<float>(image, cloud_msg, model, range_max, use_quiet_nan, cv_ptr);
+        depthimage_to_pointcloud2::convert<float>(image, cloud_msg, model, range_max, use_quiet_nan, decimation_factor, cv_ptr);
       } else {
         RCUTILS_LOG_WARN_THROTTLE(RCUTILS_STEADY_TIME, 5000,
           "Depth image has unsupported encoding [%s]", image->encoding.c_str());
@@ -137,6 +138,7 @@ class Depthimage2Pointcloud2 : public rclcpp::Node
     double range_max;
     bool use_quiet_nan;
     bool colorful;
+    int decimation_factor;
 };
 
 int main(int argc, char * argv[])
